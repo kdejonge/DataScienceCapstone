@@ -1,0 +1,130 @@
+---
+title: "Capstone Data Science Specialization"
+author: "K de Jonge"
+date: "January 7, 2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Milestone Report
+
+For the last course of the Data Science Specialization seven tasks need to be fulfilled. The first three tasks will be set out in this report.
+
+
+## Task 0
+
+The first task is to obtain the data and familiarize yourself with the data. I downloaded the data and unzipped it. The data consist of four folders:
+- de_DE
+- en_US
+- fi_FI
+- ru_RU
+
+We will use the en_US folder which consist the next three text files:
+- en_US.blogs
+- en_US.news
+- en_US.twitter
+
+
+```{r data}
+library(tm)
+
+setwd("D:/OneDrive - Esri Nederland/Kristin de Jonge/Studie/DataScience/Data Science Specialization/Course10/Coursera-SwiftKey/final/en_US")
+twitter<-readLines("D:/OneDrive - Esri Nederland/Kristin de Jonge/Studie/DataScience/Data Science Specialization/Course10/Coursera-SwiftKey/final/en_US/en_US.twitter.txt",encoding="UTF-8")
+news <- readLines("D:/OneDrive - Esri Nederland/Kristin de Jonge/Studie/DataScience/Data Science Specialization/Course10/Coursera-SwiftKey/final/en_US/en_US.news.txt",encoding="UTF-8")
+blogs <- readLines("D:/OneDrive - Esri Nederland/Kristin de Jonge/Studie/DataScience/Data Science Specialization/Course10/Coursera-SwiftKey/final/en_US/en_US.blogs.txt",encoding="UTF-8")
+
+```
+
+## Task 1
+
+The goal of this task is to get familiar with the databases and do the necessary cleaning. Herefore we will download the data in R and make a sample of the data because of the size of the dataset.
+
+
+```{r data cleaning}
+#Remove all abnormal characters
+twitterCleaned <- iconv(twitter, 'UTF-8', 'ASCII', "byte")
+newsCleaned <- iconv(news, 'UTF-8', 'ASCII', "byte")
+blogsCleaned <- iconv(blogs, 'UTF-8', 'ASCII', "byte")
+
+#Make a Sample of 10000 
+twitterSample <- sample(twitterCleaned, 10000)
+twitterdoc.vec <- VectorSource(twitterSample)                      
+twitterdoc.corpus <- Corpus(twitterdoc.vec)
+newsSample <- sample(newsCleaned, 10000)
+newsdoc.vec <- VectorSource(newsSample)                      
+newsdoc.corpus <- Corpus(newsdoc.vec)
+blogsSample <- sample(blogsCleaned, 10000)
+blogsdoc.vec <- VectorSource(blogsSample)                      
+blogsdoc.corpus <- Corpus(blogsdoc.vec)
+
+#Remove all numbers 
+twitterdoc.corpus<- tm_map(twitterdoc.corpus, removeNumbers)
+newsdoc.corpus<- tm_map(newsdoc.corpus, removeNumbers)
+blogsdoc.corpus<- tm_map(blogsdoc.corpus, removeNumbers)
+
+#Remove all punctuatins
+twitterdoc.corpus<- tm_map(twitterdoc.corpus, removePunctuation)
+newsdoc.corpus<- tm_map(newsdoc.corpus, removePunctuation)
+blogsdoc.corpus<- tm_map(blogsdoc.corpus, removePunctuation)
+
+#Convert all to lower case
+twitterdoc.corpus<- tm_map(twitterdoc.corpus, tolower)
+newsdoc.corpus<- tm_map(newsdoc.corpus, tolower)
+blogsdoc.corpus<- tm_map(blogsdoc.corpus, tolower)
+
+#Remove whitespace
+twitterdoc.corpus <- tm_map(twitterdoc.corpus, stripWhitespace)
+newsdoc.corpus <- tm_map(newsdoc.corpus, stripWhitespace)
+blogsdoc.corpus <- tm_map(blogsdoc.corpus, stripWhitespace)
+
+#Convert back to plaintext document
+twitterdoc.corpus1 <- tm_map(twitterdoc.corpus, PlainTextDocument)
+newsdoc.corpus1 <- tm_map(newsdoc.corpus, PlainTextDocument)
+blogsdoc.corpus1 <- tm_map(blogsdoc.corpus, PlainTextDocument)
+
+```
+
+
+## Task 2
+
+The goal of this task is to understand the basic relationships you observe in the data and prepare to build your first linguistic models. Therefore we will make a wordcloud.
+
+```{r exploratary analysis}
+
+# Explorig the data
+twitterlength <- length(twitter)
+newslength <- length(news)
+blogslenght <- length(blogs)
+linecount <- rbind(twitterlength, newslength, blogslenght)
+linecount
+
+#Word count of each file
+library(stringi)
+twitterwordsz <- sum(stri_count_words(twitter))
+newswordsz <- sum(stri_count_words(news))
+blogswordsz <- sum(stri_count_words(blogs))
+wordcount <- rbind(twitterwordsz, newswordsz, blogswordsz)
+wordcount
+
+# Size of the files
+twittersize <- file.info("D:/OneDrive - Esri Nederland/Kristin de Jonge/Studie/DataScience/Data Science Specialization/Course10/Coursera-SwiftKey/final/en_US/en_US.twitter.txt")$size / 1024 ^ 2
+newssize <- file.info("D:/OneDrive - Esri Nederland/Kristin de Jonge/Studie/DataScience/Data Science Specialization/Course10/Coursera-SwiftKey/final/en_US/en_US.news.txt")$size / 1024 ^ 2
+blogssize <- file.info("D:/OneDrive - Esri Nederland/Kristin de Jonge/Studie/DataScience/Data Science Specialization/Course10/Coursera-SwiftKey/final/en_US/en_US.blogs.txt")$size / 1024 ^ 2
+
+
+# Making a wordcloud
+library(wordcloud)
+twittercloud <- wordcloud(twitterdoc.corpus, max.words = 200, random.order = FALSE,rot.per=0.35,  use.r.layout=FALSE,colors=brewer.pal(8, "Dark2"))
+newscloud <- wordcloud(newsdoc.corpus, max.words = 200, random.order = FALSE,rot.per=0.35, use.r.layout=FALSE,colors=brewer.pal(8, "Dark2"))
+blogscloud <- wordcloud(blogsdoc.corpus, max.words = 200, random.order = FALSE,rot.per=0.35, use.r.layout=FALSE,colors=brewer.pal(8, "Dark2"))
+
+
+
+```
+
+
+
+
