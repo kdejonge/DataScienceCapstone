@@ -1,0 +1,96 @@
+---
+title: "Data Science Capstone Milestone"
+author: "K de Jonge"
+date: "January 4, 2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Report Quiz 1
+
+
+```{r quiz1}
+install.packages("tm")
+library(tm)
+setwd("D:/OneDrive - Esri Nederland/Kristin de Jonge/Studie/DataScience/Data Science Specialization/Course10/Coursera-SwiftKey/final/en_US")
+
+#2. The en_US.twitter.txt has how many lines of text? [1] 2360148
+twitter <- readLines(con <- file("./en_US.twitter.txt"), encoding = "UTF-8", skipNul = TRUE)
+close(con)
+length(twitter)
+
+#3. 3.What is the length of the longest line seen in any of the three en_US data sets? Is Over 40 thousand in the blogs data set.
+fileName="en_US.blogs.txt"
+con=file(fileName,open="r")
+lineBlogs=readLines(con) 
+longBlogs=length(line)
+close(con)
+
+fileName="en_US.news.txt"
+con=file(fileName,open="r")
+lineNews=readLines(con)
+longNews=length(line)
+close(con)
+
+fileName="en_US.twitter.txt"
+con=file(fileName,open="r")
+lineTwitter=readLines(con) 
+longTwitter=length(line)
+close(con)
+
+require(stringi)
+longBlogs<-stri_length(lineBlogs)
+max(longBlogs)
+longNews<-stri_length(lineNews)
+max(longNews)
+longTwitter<-stri_length(lineTwitter)
+max(longTwitter)
+
+# 4. In the en_US twitter data set, if you divide the number of lines where the word "love" (all lowercase) occurs by the number of lines the word "hate" (all lowercase) occurs, about what do you get? Is = 4
+loveTwitter<-grep("love",lineTwitter)
+love<- length(loveTwitter)
+hateTwitter<-grep("hate",lineTwitter)
+hate<- length(hateTwitter)
+love/hate
+
+# 5. The one tweet in the en_US twitter data set that matches the word "biostats" says what?
+biostatsTwitter<-grep("biostats",lineTwitter)
+lineTwitter[biostatsTwitter]
+
+# 6. How many tweets have the exact characters "A computer once beat me at chess, but it was no match for me at kickboxing". (I.e. the line matches those characters exactly.) Is 3
+sentenceTwitter<-grep("A computer once beat me at chess, but it was no match for me at kickboxing",lineTwitter)
+length(sentenceTwitter)
+
+
+```
+https://rpubs.com/patihe/162182
+http://rpubs.com/Adaleid/456351
+
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+#Create profane list in the file folder and list here the words you do not want to read
+profane<-readLines("D:/OneDrive - Esri Nederland/Kristin de Jonge/Studie/DataScience/Data Science Specialization/Course10/Coursera-SwiftKey/final/en_US/en_profanitylist.txt",encoding="UTF-8")
+
+#Remove profanity with the use of regular expression
+regex_profane <-paste(profane, collapse=' | ')
+regex_profane <-sprintf(" %s ", regex_profane)
+regex_profane <-tolower(regex_profane)
+
+twitterCleaned <- gsub(regex_profane," ", twitterCleaned)
+newsCleaned <- gsub(regex_profane," ", newsCleaned)
+blogsCleaned <- gsub(regex_profane," ", blogsCleaned)
+
+twitterCleaned <- gsub(' {2,}',' ', twitterCleaned)
+newsCleaned <- gsub(' {2,}',' ', newsCleaned)
+blogsCleaned <- gsub(' {2,}',' ', blogsCleaned)
+
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
